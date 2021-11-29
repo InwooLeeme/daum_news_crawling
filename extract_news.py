@@ -55,7 +55,8 @@ def extract_body(url):
 def extract_article(max_pages, date):
     news = []
     NEWS_URL = "https://news.daum.net/breakingnews/politics?page={}&regDate=" + date
-    for page in range(1, max_pages + 1):
+    limit_pages = int(max_pages) + 1
+    for page in range(1, limit_pages):
         res = requests.get(NEWS_URL.format(page), headers=headers)
         if res.status_code == 200:
             print(f'page : {page}')

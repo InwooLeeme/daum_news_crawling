@@ -6,7 +6,7 @@
 
 - BeautifulSoup
 - requests
-- datetime
+- json
 
 ## 프로그램 소개
 

@@ -27,3 +27,65 @@ def extract_max_pages(date):
             max_pages = pages.get_text()
             break
     return max_pages
+
+# 리포터 이름만 추출
+
+
+def extract_reporter(url):
+    res = requests.get(url)
+    html = BeautifulSoup(res.text, "html.parser")
+    header = html.find("div", class_="head_view")
+    repoter = header.find("span", class_="txt_info").get_text()
+    return repoter
+
+# 해당 기사의 본문 추출
+
+
+def extract_body(url):
+    res = requests.get(url)
+    html = BeautifulSoup(res.text, "html.parser")
+    contents = html.find("div", class_="article_view").find(
+        "section").find_all('p')[:-1]
+    lists = []
+    for p in contents:
+        lists.append(p.text)
+    return lists
+
+
+def extract_article(max_pages, date):
+    news = []
+    NEWS_URL = "https://news.daum.net/breakingnews/politics?page={}&regDate=" + date
+    for page in range(1, max_pages + 1):
+        res = requests.get(NEWS_URL.format(page), headers=headers)
+        if res.status_code == 200:
+            print(f'page : {page}')
+            html = BeautifulSoup(res.text, "html.parser")
+            cont = html.find('ul', class_="list_news2 list_allnews")
+            try:
+                items = cont.findAll('li')
+            except Exception as e:
+                print(str(e))
+                break
+            else:
+                for item in items:
+                    article = item.find('strong', class_="tit_thumb")
+                    title = article.a
+                    article_info = article.find(
+                        "span", class_="info_news").get_text()
+                    article_url = title['href']
+                    reporter = extract_reporter(article_url)
+                    article_body = [extract_body(article_url)]
+                    news.append({
+                        'page': page,  # 해당 기사가 있는 페이지
+                        'title': title.get_text(strip=True),  # 기사 제목
+                        'url': article_url,  # 기사 url
+                        # 언론사
+                        'company': article_info[:5].replace('·', '').strip(),
+                        # 올라온 시간
+                        'time': article_info[5:].replace('·', '').strip(),
+                        'reporter': reporter,  # 해당 기사를 작성한 사람
+                        "body": article_body  # 기사의 본문
+                    })
+        else:
+            break
+    return news

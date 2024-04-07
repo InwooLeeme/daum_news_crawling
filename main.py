@@ -1,3 +1,4 @@
+"""extract html and return json"""
 import json
 from extract_news import extract_article, extract_max_pages
 

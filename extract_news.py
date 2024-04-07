@@ -1,5 +1,4 @@
-"""extract html"""
-from sys import maxsize
+"""extract html modules"""
 from bs4 import BeautifulSoup
 import requests
 

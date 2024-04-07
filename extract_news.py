@@ -1,3 +1,4 @@
+"""extract html"""
 from sys import maxsize
 from bs4 import BeautifulSoup
 import requests
@@ -11,10 +12,12 @@ headers = headers = {
 
 
 def extract_max_pages(date):
+    """extract max pages in date"""
     last = False
     max_pages = 0
     i = 1
-    while last == False:
+    #while last == False: 수정전
+    while last is False:
         news_url = "https://news.daum.net/breakingnews/politics?page={}&regDate=" + date
         res = requests.get(news_url.format(i))
         html = BeautifulSoup(res.text, "html.parser")
@@ -31,8 +34,9 @@ def extract_max_pages(date):
 # 리포터 이름만 추출
 
 
-def extract_reporter(url):
-    res = requests.get(url)
+def extract_reporter(url : str) -> str:
+    """extract report function"""
+    res = requests.get(url, timeout=10)
     html = BeautifulSoup(res.text, "html.parser")
     header = html.find("div", class_="head_view")
     repoter = header.find("span", class_="txt_info").get_text()
@@ -41,8 +45,9 @@ def extract_reporter(url):
 # 해당 기사의 본문 추출
 
 
-def extract_body(url):
-    res = requests.get(url)
+def extract_body(url : str) -> list:
+    """extract body and return list"""
+    res = requests.get(url, timeout=10)
     html = BeautifulSoup(res.text, "html.parser")
     contents = html.find("div", class_="article_view").find(
         "section").find_all('p')[:-1]
@@ -52,7 +57,8 @@ def extract_body(url):
     return lists
 
 
-def extract_article(max_pages, date):
+def extract_article(max_pages, date) -> list:
+    "extract article and return news"
     news = []
     NEWS_URL = "https://news.daum.net/breakingnews/politics?page={}&regDate=" + date
     limit_pages = int(max_pages) + 1
@@ -64,7 +70,7 @@ def extract_article(max_pages, date):
             cont = html.find('ul', class_="list_news2 list_allnews")
             try:
                 items = cont.findAll('li')
-            except Exception as e:
+            except AttributeError as e:
                 print(str(e))
                 break
             else:

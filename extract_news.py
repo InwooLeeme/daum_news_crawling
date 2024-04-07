@@ -46,7 +46,7 @@ def extract_reporter(url : str) -> str:
 
 def extract_body(url : str) -> list:
     """extract body and return list"""
-    res = requests.get(url, timeout=10)
+    res = requests.get(url, timeout=10) # Timeout 추가
     html = BeautifulSoup(res.text, "html.parser")
     contents = html.find("div", class_="article_view").find(
         "section").find_all('p')[:-1]
